@@ -9,6 +9,15 @@
   --surface: #23272a;
   --text: #ffffff;
   --secondary: #99aab5;
+  --transition: all 0.3s ease;
+}
+
+:root[data-theme="light"] {
+  --primary: #5865f2;
+  --background: #f6f6f7;
+  --surface: #ffffff;
+  --text: #2c2f33;
+  --secondary: #4f545c;
 }
 
 * {
@@ -22,13 +31,16 @@ body {
   background: var(--background);
   color: var(--text);
   line-height: 1.6;
+  transition: var(--transition);
 }
 
 .header {
   background: var(--surface);
   padding: 2rem;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  position: relative;
+  transition: var(--transition);
 }
 
 .logo {
@@ -36,6 +48,35 @@ body {
   font-weight: 700;
   color: var(--primary);
   margin-bottom: 1rem;
+  transition: var(--transition);
+}
+
+.floating-menu {
+  position: fixed;
+  right: 2rem;
+  bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  z-index: 1000;
+}
+
+.menu-button {
+  background: var(--primary);
+  color: var(--text);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: var(--transition);
+}
+
+.menu-button:hover {
+  transform: scale(1.1);
 }
 
 .nav {
@@ -43,22 +84,25 @@ body {
   justify-content: center;
   gap: 1rem;
   margin: 1rem 0;
+  flex-wrap: wrap;
 }
 
 .button {
   background: var(--primary);
   color: var(--text);
   padding: 0.75rem 1.5rem;
-  border-radius: 4px;
+  border-radius: 8px;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  transition: opacity 0.2s;
+  transition: var(--transition);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .button:hover {
-  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 .container {
@@ -69,40 +113,64 @@ body {
 
 .commands {
   background: var(--surface);
-  border-radius: 8px;
+  border-radius: 16px;
   padding: 2rem;
   margin: 2rem 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: var(--transition);
 }
 
 .command {
   margin-bottom: 1.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--secondary);
+  padding: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition);
 }
 
-.command:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
-  padding-bottom: 0;
+.command:hover {
+  background: rgba(114, 137, 218, 0.1);
+  transform: translateX(8px);
+}
+
+.command-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .command-name {
   color: var(--primary);
   font-weight: 500;
-  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
 }
 
 .command-desc {
   color: var(--secondary);
+  margin-top: 0.5rem;
 }
 
-.material-icons {
-  vertical-align: middle;
+.command-examples {
+  display: none;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(114, 137, 218, 0.1);
+  border-radius: 8px;
+}
+
+.command.active .command-examples {
+  display: block;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-10px) rotate(5deg); }
 }
 
 .floating-calc {
@@ -124,9 +192,13 @@ body {
         <span class="material-icons">add</span>
         Add to Discord
       </a>
-      <a href="https://github.com/155601-mikey/calcbot" class="button">
+      <a href="https://github.com/yourusername/calcbot" class="button">
         <span class="material-icons">code</span>
         View on GitHub
+      </a>
+      <a href="https://github.com/yourusername/calcbot/issues" class="button">
+        <span class="material-icons">bug_report</span>
+        Report Issue
       </a>
     </nav>
   </header>
@@ -135,48 +207,111 @@ body {
     <h2><span class="material-icons">menu_book</span> Commands</h2>
     <div class="commands">
       <div class="command">
-        <div class="command-name">/ping</div>
+        <div class="command-header">
+          <span class="material-icons">speed</span>
+          <div class="command-name">/ping</div>
+        </div>
         <div class="command-desc">Check if the bot is online.</div>
       </div>
       
       <div class="command">
-        <div class="command-name">/math [expression]</div>
-        <div class="command-desc">Solve math expressions or equations<br>
-        Examples: /math 2+2, /math x+6=8, /math √4, /math π*2, /math 3²</div>
+        <div class="command-header">
+          <span class="material-icons">functions</span>
+          <div class="command-name">/math [expression]</div>
+        </div>
+        <div class="command-desc">Solve math expressions or equations</div>
+        <div class="command-examples">
+          Examples:<br>
+          • /math 2+2<br>
+          • /math x+6=8<br>
+          • /math √4<br>
+          • /math π*2<br>
+          • /math 3²
+        </div>
       </div>
 
       <div class="command">
-        <div class="command-name">/plot [equation]</div>
-        <div class="command-desc">Plot a mathematical function<br>
-        Example: /plot y=x**2</div>
+        <div class="command-header">
+          <span class="material-icons">show_chart</span>
+          <div class="command-name">/plot [equation]</div>
+        </div>
+        <div class="command-desc">Plot a mathematical function</div>
+        <div class="command-examples">
+          Example: /plot y=x**2
+        </div>
       </div>
 
       <div class="command">
-        <div class="command-name">/convert [query]</div>
-        <div class="command-desc">Convert units or currencies<br>
-        Examples: /convert 10 cm to inches, /convert USD to EUR</div>
+        <div class="command-header">
+          <span class="material-icons">swap_horiz</span>
+          <div class="command-name">/convert [query]</div>
+        </div>
+        <div class="command-desc">Convert units or currencies</div>
+        <div class="command-examples">
+          Examples:<br>
+          • /convert 10 cm to inches<br>
+          • /convert USD to EUR
+        </div>
       </div>
 
       <div class="command">
-        <div class="command-name">/history</div>
+        <div class="command-header">
+          <span class="material-icons">history</span>
+          <div class="command-name">/history</div>
+        </div>
         <div class="command-desc">View your recent math history.</div>
       </div>
 
       <div class="command">
-        <div class="command-name">/setvar [name] [value]</div>
-        <div class="command-desc">Define custom variables<br>
-        Example: /setvar a 5</div>
+        <div class="command-header">
+          <span class="material-icons">data_object</span>
+          <div class="command-name">/setvar [name] [value]</div>
+        </div>
+        <div class="command-desc">Define custom variables</div>
+        <div class="command-examples">
+          Example: /setvar a 5
+        </div>
       </div>
 
       <div class="command">
-        <div class="command-name">/help</div>
+        <div class="command-header">
+          <span class="material-icons">help</span>
+          <div class="command-name">/help</div>
+        </div>
         <div class="command-desc">Get this help message.</div>
       </div>
     </div>
   </main>
 
+  <div class="floating-menu">
+    <div class="menu-button" id="theme-toggle">
+      <span class="material-icons">dark_mode</span>
+    </div>
+    <a href="#top" class="menu-button">
+      <span class="material-icons">arrow_upward</span>
+    </a>
+  </div>
+
   <script>
-    // Add smooth scroll behavior
+    // Theme toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = themeToggle.querySelector('.material-icons');
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      themeIcon.textContent = newTheme === 'light' ? 'dark_mode' : 'light_mode';
+    });
+
+    // Command expandable sections
+    document.querySelectorAll('.command').forEach(command => {
+      command.addEventListener('click', () => {
+        command.classList.toggle('active');
+      });
+    });
+
+    // Smooth scroll
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function (e) {
         e.preventDefault();
